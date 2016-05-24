@@ -2,46 +2,44 @@ var Game = {};
 
 Game.fps = 30;
 
-
 Game.initialize = function() {
-  this.entities = [];
-  this.context = document.getElementById("canvas").getContext("2d");
 
-  // =====
-  // Example
-  this.rect_x = 0
-  this.rect_y = 0
-  // =====
+	this.entities = [
+			new PoliceCar(20, 120, '#F00' ),
+			new SlowCar( 10, 140, '#0F0' ),
+			new SlowCar( 40, 140, '#00F' )
+		];
+
+	this.context = document.getElementById("canvas").getContext("2d");
+
+	this.currentRoadSegment = 250;
 };
 
 
 Game.draw = function() {
-  this.context.clearRect(0, 0, 800, 600);
+	this.context.clearRect(0, 0, 800, 600);
 
-  // Your code goes here
-
-  // =====
-  // Example
-  this.context.fillRect(this.rect_x, this.rect_y, 100, 100)
-  //=====
+	for ( id in this.entities ) {
+		this.context.fillStyle = this.entities[ id ].appearance;
+		this.context.fillRect(this.entities[id].position.x, this.currentRoadSegment - this.entities[id].position.y, 20, 20)	;	
+	}
 };
 
 
 Game.update = function() {
-  // Your code goes here
+	this.currentRoadSegment += this.entities[ 0 ].engine.speed - this.entities[ 0 ].engine.acceleration;
 
-  // =====
-  // Example
-  this.rect_x += 1
-  if (this.rect_x >= 800) {
-    this.rect_x = -100
-  }
+	for ( id in this.entities ) {
+		this.entities[id].update();
+	}
 
-  this.rect_y += 1
-  if (this.rect_y >= 600) {
-    this.rect_y = -100
-  }
-  // =====
 };
 
 
+Game.onLeft = function() {
+	this.entities[ 0 ].position.x--;
+}
+
+Game.onRight = function() {
+	this.entities[ 0 ].position.x++;
+}
