@@ -11,4 +11,9 @@ function Engine(initialSpeed, initialAcceleration) {
 			this.acceleration--;
 		}
 	} 
+
+	this.stop = function() {
+	    this.speed = 0;
+	    this.acceleration = 0;
+	}
 }

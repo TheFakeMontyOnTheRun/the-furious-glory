@@ -1,6 +1,9 @@
 var score = 0;
 
 function RacingGameState() {
+
+    this.camera = new Vec2( 0, 200 );
+
     this.init = function() {
 	this.entities = [
 			 new PoliceCar(20, 120, '#F00' ),
@@ -9,6 +12,7 @@ function RacingGameState() {
 			 ];
 	
 	this.currentRoadSegment = 250;
+	this.timeForNextCar = 200;
     };
 
     this.draw = function( context ) {
@@ -21,27 +25,40 @@ function RacingGameState() {
 	    context.fillRect(car.position.x, this.currentRoadSegment - car.position.y, car.size.x, car.size.y);	
 	}
 
-
 	context.fillStyle = "#000";
 	context.fillText( "Distance: " + this.currentRoadSegment, 10, 50 );
     };
     
     this.update = function() {
 	this.currentRoadSegment += this.entities[ 0 ].engine.speed - this.entities[ 0 ].engine.acceleration;
-	
+	this.camera.y = this.currentRoadSegment;
+	this.timeForNextCar--;
+
+	if ( this.timeForNextCar == 0 ) {
+	    this.timeForNextCar = 200;
+
+	    this.entities[ 1 ].position.y = this.currentRoadSegment;
+	    this.entities[ 1 ].position.x = Math.round( Math.random() * 3 ) * this.entities[ 1 ].size.x;
+	}
+
 	for ( id in this.entities ) {
 	    this.entities[id].update();
 	}
 	
 	//O(nlogn)
+	var car1;
+	var car2;
 	for ( var c = 0; c < this.entities.length - 1; ++c ) {
+	    car1 = this.entities[ c ];
 	    for ( var d = c + 1; d < this.entities.length; ++d ) {
-		if ( this.checkCollision( this.entities[ c ], this.entities[ d ] ) ) {
-		    this.entities[ d ].engine.speed = 0;
-		    this.entities[ d ].engine.acceleration = 0;
-		    this.entities[ c ].engine.speed = 0;
-		    this.entities[ c ].engine.acceleration = 0;		    
-		
+
+		car2 = this.entities[ d ];
+
+		if ( this.checkCollision( car1, car2 ) || this.checkCollision( car2, car1 ) ) {
+
+		    car1.stop();
+		    car2.stop();
+
 		    score = this.currentRoadSegment;
 
 		    return function( gameStateList ) {

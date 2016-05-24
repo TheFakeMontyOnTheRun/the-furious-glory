@@ -7,4 +7,8 @@ function SlowCar(x, y, style ) {
 	this.update = function() {
 		this.engine.update( this.position );
 	}
+
+	this.stop = function() {
+	    this.engine.stop();
+	}
 }
