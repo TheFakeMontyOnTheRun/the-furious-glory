@@ -86,10 +86,10 @@ function RacingGameState() {
     };
     
     this.onLeft = function() {
-	this.entities[ 0 ].position.x-=20;
+	this.entities[ 0 ].moveLeft();
     };
     
     this.onRight = function() {
-	this.entities[ 0 ].position.x+=20;
+	this.entities[ 0 ].moveRight();
     };
 };
