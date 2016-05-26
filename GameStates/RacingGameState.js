@@ -8,19 +8,12 @@ function RacingGameState() {
 
     //my kingdom for a constant
     this.numberOfLanes = 4;
-    this.borderSpaceOnEdgeLanes = 32;
-    this.textureHeight = 127;
-    this.laneWidth = 64;
-    this.laneWidthInWorldSpace = 64;
-    this.screenWidth = 800;
-    this.screenHeight = 600;
-    this.treePatchTextureWidth = 230;
-    this.timeForCarSpawn = 20;
+    this.timeForCarSpawn = 100;
 
     this.penalties = 0;
 
     this.lanePosition = function( lane ) {
-	return lane * this.laneWidthInWorldSpace;
+	return lane * this.gameAssets.laneWidthInWorldSpace;
     }
 
     this.init = function() {
@@ -34,42 +27,12 @@ function RacingGameState() {
 			 ];
 
 	this.currentRoadSegment = 250;
-	this.timeForNextCar = 200;
+	this.timeForNextCar = this.timeForCarSpawn;
 	this.playerCar = this.entities[ 0 ];
     };
 
     this.translateToScreenSpace = function( worldSpacePosition ) {
-	return new Vec2( ( 800 / 2 ) - ( ( this.numberOfLanes / 2 ) * this.laneWidth ) + this.laneWidth * ( ( worldSpacePosition.x) / this.laneWidthInWorldSpace ), this.currentRoadSegment - worldSpacePosition.y + this.textureHeight);
-    }
-
-
-    this.renderRoad = function(context) {
-	//terribly, terrible based on game screen area...I would love to make this more independent
-	var offset = this.currentRoadSegment % this.textureHeight; //128 is due to the texture size being 128
-	var center = this.screenWidth / 2;
-
-	var roadPieceHeight;
-	var roadTilePosition;
-
-	for ( var i = -1; i < (Math.ceil( this.screenHeight / this.textureHeight) + 1 ); ++i ) {
-	    roadPiecePos = offset + ( i * this.textureHeight );
-
-	    roadTilePosition = center;
-	    context.drawImage( this.gameAssets.roadCenter, roadTilePosition, roadPiecePos );
-
-	    roadTilePosition -= this.laneWidth;
-	    context.drawImage( this.gameAssets.roadCenter, roadTilePosition, roadPiecePos );
-	    roadTilePosition -= this.laneWidth + this.borderSpaceOnEdgeLanes;
-	    context.drawImage( this.gameAssets.roadLeftCorner, roadTilePosition, roadPiecePos );
-	    roadTilePosition -= this.treePatchTextureWidth;
-	    context.drawImage( this.gameAssets.trees, roadTilePosition, roadPiecePos );	    
-
-
-	    roadTilePosition = center + this.laneWidth;
-	    context.drawImage( this.gameAssets.roadRightCorner, roadTilePosition, roadPiecePos );
-	    roadTilePosition += this.laneWidth + this.borderSpaceOnEdgeLanes;
-	    context.drawImage( this.gameAssets.trees, roadTilePosition, roadPiecePos );
-	}
+	return new Vec2( ( 800 / 2 ) - ( ( this.numberOfLanes / 2 ) * this.gameAssets.laneWidth ) + this.gameAssets.laneWidth * ( ( worldSpacePosition.x) / this.gameAssets.laneWidthInWorldSpace ), this.currentRoadSegment - worldSpacePosition.y + this.gameAssets.textureHeight);
     }
 
     this.draw = function( context ) {
@@ -77,8 +40,8 @@ function RacingGameState() {
 	var car;
 	var screenPosition;
 	var carSprite;
-	this.renderRoad(context);
-
+	
+	drawRoadWithOffset( context, this.gameAssets, this.currentRoadSegment );
 
 	for ( var id = this.entities.length - 1; id >= 0; --id ) {
 	    car = this.entities[ id ];
@@ -90,7 +53,7 @@ function RacingGameState() {
 
 	context.fillStyle = "#F00";
 	context.fillText( "Score: " + Math.ceil( this.currentRoadSegment - this.penalties), 10, 50 );
-	context.fillText( "Speed: " + Math.floor(this.playerCar.engine.speed), 10, 60 );
+	context.fillText( "Speed: " + Math.floor(this.playerCar.engine.speed), 10, 70 );
 
     };
 
@@ -114,9 +77,10 @@ function RacingGameState() {
 	    var randomCar = this.entities[ Math.ceil( Math.random() * 5 ) ];
 
 	    var screenPosition = this.translateToScreenSpace( randomCar.position );
-	    if ( screenPosition.y > this.screenHeight ) {
+
+	    if ( screenPosition.y > this.gameAssets.screenHeight || screenPosition.y < -this.gameAssets.textureHeight ) {
 		//spawn car ahead of camera, so it will transition smoothly into view
-		randomCar.position.y = 2 * this.textureHeight + this.currentRoadSegment;
+		randomCar.position.y = 2 * this.gameAssets.textureHeight + this.currentRoadSegment;
 		randomCar.lane = Math.floor( Math.random() * this.numberOfLanes );
 	    }
 	}

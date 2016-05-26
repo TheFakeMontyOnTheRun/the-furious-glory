@@ -12,6 +12,8 @@ Game.initialize = function() {
 
     //not my brightest hour, but I'm no Javascript programmer and the deadline looms by
     this.entities.gamePlay.gameAssets = this.entities.gameLoading.gameAssets;
+    this.entities.gameTitle.gameAssets = this.entities.gameLoading.gameAssets;
+    this.entities.gameOver.gameAssets = this.entities.gameLoading.gameAssets;
     
     this.context = document.getElementById("canvas").getContext("2d");
     this.currentState = this.entities.gameLoading; 

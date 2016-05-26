@@ -4,6 +4,14 @@ var toLoad;
 
 function GameAssets() {
 
+    this.borderSpaceOnEdgeLanes = 32;
+    this.textureHeight = 127;
+    this.laneWidth = 64;
+    this.laneWidthInWorldSpace = 64;
+    this.screenWidth = 800;
+    this.screenHeight = 600;
+    this.treePatchTextureWidth = 230;
+
     toLoad = 10;
 	
     this.onImageDoneLoading = function() {
