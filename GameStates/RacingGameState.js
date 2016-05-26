@@ -11,10 +11,13 @@ function RacingGameState() {
     this.borderSpaceOnEdgeLanes = 32;
     this.textureHeight = 127;
     this.laneWidth = 64;
-    this.laneWidthInWorldSpace = 20;
+    this.laneWidthInWorldSpace = 64;
     this.screenWidth = 800;
     this.screenHeight = 600;
     this.treePatchTextureWidth = 230;
+    this.timeForCarSpawn = 20;
+
+    this.penalties = 0;
 
     this.lanePosition = function( lane ) {
 	return lane * this.laneWidthInWorldSpace;
@@ -23,17 +26,20 @@ function RacingGameState() {
     this.init = function() {
 	this.entities = [
 			 new PoliceCar( this.lanePosition( 2 ), 120, 'blueCar' ),
+			 new Oil( this.lanePosition( 2 ), 8000, 'oilSpill' ),
+			 new Hole( this.lanePosition( 0 ), 5000, 'hole' ),
 			 new SlowCar( this.lanePosition( 0 ), 440, 1, 'redCar' ),
 			 new SlowCar( this.lanePosition( 1 ), 440,2,  'blackCar' ),
 			 new SlowCar( this.lanePosition( 3 ), 440,0, 'yellowCar' )
 			 ];
-	
+
 	this.currentRoadSegment = 250;
 	this.timeForNextCar = 200;
+	this.playerCar = this.entities[ 0 ];
     };
 
     this.translateToScreenSpace = function( worldSpacePosition ) {
-	return new Vec2( ( 800 / 2 ) - ( ( this.numberOfLanes / 2 ) * this.laneWidth ) + this.laneWidth * ( ( worldSpacePosition.x) / this.laneWidthInWorldSpace ), this.currentRoadSegment - worldSpacePosition.y );
+	return new Vec2( ( 800 / 2 ) - ( ( this.numberOfLanes / 2 ) * this.laneWidth ) + this.laneWidth * ( ( worldSpacePosition.x) / this.laneWidthInWorldSpace ), this.currentRoadSegment - worldSpacePosition.y + this.textureHeight);
     }
 
 
@@ -73,33 +79,46 @@ function RacingGameState() {
 	var carSprite;
 	this.renderRoad(context);
 
-	for ( id in this.entities ) {
+
+	for ( var id = this.entities.length - 1; id >= 0; --id ) {
 	    car = this.entities[ id ];
 
 	    carSprite = this.gameAssets[ car.appearance ];
 	    screenPosition = this.translateToScreenSpace( car.position );
-	    context.fillStyle = car.appearance;
 	    context.drawImage( carSprite, screenPosition.x, screenPosition.y );
 	}
 
 	context.fillStyle = "#F00";
-	context.fillText( "Distance: " + this.currentRoadSegment, 10, 50 );
-	context.fillText( "Speed: " + this.entities[ 0 ].engine.speed, 10, 60 );
+	context.fillText( "Score: " + Math.ceil( this.currentRoadSegment - this.penalties), 10, 50 );
+	context.fillText( "Speed: " + Math.floor(this.playerCar.engine.speed), 10, 60 );
 
     };
+
+
+    this.isHole = function( entity ) {
+	return entity.appearance == 'hole';
+    }
+
+    this.isOilSpill = function( entity ) {
+	return entity.appearance == 'oilSpill';
+    }
     
     this.update = function() {
 
-	this.currentRoadSegment += this.entities[ 0 ].engine.speed + this.entities[ 0 ].engine.acceleration;
+	this.currentRoadSegment += this.playerCar.engine.speed + this.playerCar.engine.acceleration;
 	this.timeForNextCar--;
 
-	if ( this.timeForNextCar == 0 ) {
+	if ( this.timeForNextCar <= 0 ) {
 
-	    this.timeForNextCar = 200;
+	    this.timeForNextCar = this.timeForCarSpawn;
+	    var randomCar = this.entities[ Math.ceil( Math.random() * 5 ) ];
 
-	    //spawn car ahead of camera, so it will transition smoothly into view
-	    this.entities[ 1 ].position.y = this.currentRoadSegment + ( 3 * this.entities[ 1 ].size.y );
-	    this.entities[ 1 ].lane = Math.floor( Math.random() * this.numberOfLanes );
+	    var screenPosition = this.translateToScreenSpace( randomCar.position );
+	    if ( screenPosition.y > this.screenHeight ) {
+		//spawn car ahead of camera, so it will transition smoothly into view
+		randomCar.position.y = 2 * this.textureHeight + this.currentRoadSegment;
+		randomCar.lane = Math.floor( Math.random() * this.numberOfLanes );
+	    }
 	}
 
 	for ( id in this.entities ) {
@@ -109,27 +128,35 @@ function RacingGameState() {
 	//O(nlogn)
 	var car1;
 	var car2;
+
 	for ( var c = 0; c < this.entities.length - 1; ++c ) {
 	    car1 = this.entities[ c ];
-	    for ( var d = c + 1; d < this.entities.length; ++d ) {
 
+	    for ( var d = c + 1; d < this.entities.length; ++d ) {
 		car2 = this.entities[ d ];
 		
-		if ( this.checkCollision( car1, car2 ) || this.checkCollision( car2, car1 ) ) {
-
-		    car1.stop();
-		    car2.stop();
-
-		    if ( this.isPlayer( car1 ) || this.isPlayer( car2 ) ) {
-			score = this.currentRoadSegment;
+		if ( this.checkCollision( car1, car2 ) ) {
+		    if ( this.isHole( car2 ) ) {
+			this.readySound.play();
+			this.penalties -= car2.hitPenalty;
+		    } else if ( this.isOilSpill( car2 ) ){
+			car1.skid();
+		    } else {
 			
-			return function( gameStateList ) {
-			    gameStateList.gameOver.init( score );
-			    return gameStateList.gameOver;
+			car1.stop();
+			car2.stop();
+
+			if ( this.isPlayer( car1 ) || this.isPlayer( car2 ) ) {
+			    score = this.currentRoadSegment;
+			    
+			    return function( gameStateList ) {
+				gameStateList.gameOver.init( score );
+				return gameStateList.gameOver;
+			    }
 			}
+			
 		    }
 		}
-		
 	    }
 	}
 	
@@ -144,8 +171,8 @@ function RacingGameState() {
     
     this.checkCollision = function( car1, car2 ) {
 	
-	if ( ( car1.position.x >= car2.position.x ) && ( car1.position.x < ( car2.position.x + car2.size.x ) ) ) {
-	    if ( ( car1.position.y >= car2.position.y ) && ( car1.position.y < ( car2.position.y + car2.size.y ) ) ) {
+	if ( Math.abs(car1.position.x - car2.position.x ) < Math.max( car1.size.x, car2.size.x) ) {
+	    if ( Math.abs(car1.position.y - car2.position.y ) < Math.max( car1.size.y, car2.size.y) ) {
 		return true;
 	    }
 	}
@@ -154,10 +181,10 @@ function RacingGameState() {
     };
     
     this.onLeft = function() {
-	this.entities[ 0 ].moveLeft();
+	this.playerCar.moveLeft();
     };
     
     this.onRight = function() {
-	this.entities[ 0 ].moveRight();
+	this.playerCar.moveRight();
     };
 };

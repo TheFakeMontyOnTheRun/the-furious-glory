@@ -1,10 +1,19 @@
 function PoliceCar(x, y, style ) {
 	this.position = new Vec2(x,y);
-	this.size = new Vec2(20, 50 );
-	this.engine = new Engine( 0, 0.025, 25 );
+	this.size = new Vec2(64, 123 );
+	this.engine = new Engine( 10, 0, 25 ); //0, 0.025, 25 );
 	this.appearance = style;
 	this.lane = x / this.size.x;
 	this.targetPosition;
+
+
+	this.skid = function() {
+	    if ( Math.random() > 0.5 ) {
+		this.moveLeft();
+	    } else {
+		this.moveRight();
+	    }
+	}
 
 	this.movingLeft = function() {
 

@@ -6,15 +6,13 @@ function GameOverGameState() {
 
     this.init = function( score ) {
 	this.pressedAnyKey = false;
-
-	if ( this.highestScore < score ) {
-	    this.highestScore = score;
+	this.currentScore = Math.ceil(score);
+	if ( this.highestScore <= this.currentScore ) {
+	    this.highestScore = Math.ceil(score);
 	    this.gotTheHighestScore = true;
 	} else {
 	    this.gotTheHighestScore = false;
 	}
-
-	this.currentScore = score;
     };
 
     this.draw = function(context) {

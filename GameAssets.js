@@ -4,7 +4,7 @@ var toLoad;
 
 function GameAssets() {
 
-    toLoad = 8;
+    toLoad = 10;
 	
     this.onImageDoneLoading = function() {
 	toLoad--;
@@ -34,6 +34,12 @@ function GameAssets() {
     this.roadCenter = new Image();
     this.roadCenter.onload = this.onImageDoneLoading;
 
+    this.oilSpill = new Image();
+    this.oilSpill.onload = this.onImageDoneLoading;
+
+    this.hole = new Image();
+    this.hole.onload = this.onImageDoneLoading;
+
     this.isReadyToProceed = function() {
 	return toLoad <= 0;
     }
@@ -46,4 +52,7 @@ function GameAssets() {
     this.roadLeftCorner.src = "images/roadLeft.png";
     this.roadCenter.src = "images/roadCenter.png";
     this.roadRightCorner.src = "images/roadRight.png";
+    this.oilSpill.src = "images/oil.png";
+    this.hole.src = "images/hole.png";
+
 }
