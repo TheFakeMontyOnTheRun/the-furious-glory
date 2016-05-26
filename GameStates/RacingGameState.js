@@ -2,6 +2,17 @@ var score = 0;
 
 function RacingGameState() {
 
+    this.policeCar = new Image();
+    this.ready = false;
+    this.readySound = new Audio("apert.wav");
+    this.readySound.play();
+
+    this.policeCar.onload = function() {
+	ready = true;
+    }
+
+    this.policeCar.src = "images/police1.png";
+
     this.camera = new Vec2( 0, 200 );
 
     this.init = function() {
@@ -17,12 +28,17 @@ function RacingGameState() {
 
     this.draw = function( context ) {
 
+	if ( !ready ) {
+	    return;
+	}
+
 	var car;
 
 	for ( id in this.entities ) {
 	    car = this.entities[ id ];
 	    context.fillStyle = car.appearance;
 	    context.fillRect(car.position.x, this.currentRoadSegment - car.position.y, car.size.x, car.size.y);	
+	    context.drawImage( this.policeCar, car.position.x, this.currentRoadSegment - car.position.y );
 	}
 
 	context.fillStyle = "#000";
@@ -30,6 +46,11 @@ function RacingGameState() {
     };
     
     this.update = function() {
+
+	if ( !ready ) {
+	    return;
+	}
+
 	this.currentRoadSegment += this.entities[ 0 ].engine.speed - this.entities[ 0 ].engine.acceleration;
 	this.camera.y = this.currentRoadSegment;
 	this.timeForNextCar--;
