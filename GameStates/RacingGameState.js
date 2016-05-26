@@ -18,16 +18,35 @@ function RacingGameState() {
 	this.timeForNextCar = 200;
     };
 
+
+    this.renderRoad = function(context) {
+
+	var offset = this.currentRoadSegment % 128;
+
+	for ( var i = -1; i < (Math.ceil( 600 / 128) + 1 ); ++i ) {
+	    context.drawImage( this.gameAssets.trees, -22, offset + ( i * 128 ) );
+
+	    context.drawImage( this.gameAssets.roadLeftCorner, 208, offset + ( i *128 ) );
+	    context.drawImage( this.gameAssets.roadCenter, 336, offset + ( i *128 ) );
+	    context.drawImage( this.gameAssets.roadRightCorner, 464, offset + ( i *128 ) );
+
+	    context.drawImage( this.gameAssets.trees, 592, offset + ( i * 128 ) );
+	}
+    }
+
     this.draw = function( context ) {
 
 	var car;
 	var frame =  Math.floor( (this.currentRoadSegment / 50) % 3);
 
+
+	this.renderRoad(context);
+
 	for ( id in this.entities ) {
 	    car = this.entities[ id ];
 	    context.fillStyle = car.appearance;
 	    context.fillRect(car.position.x, this.currentRoadSegment - car.position.y, car.size.x, car.size.y);	
-	    context.drawImage( this.gameAssets.policeCar[ frame ], car.position.x, this.currentRoadSegment - car.position.y );
+	    context.drawImage( this.gameAssets.policeCar[ frame ], 208 + ( 128 * (car.position.x / 40 )), this.currentRoadSegment - car.position.y );
 	}
 
 	context.fillStyle = "#000";
@@ -46,7 +65,7 @@ function RacingGameState() {
 	    this.timeForNextCar = 200;
 
 	    this.entities[ 1 ].position.y = this.currentRoadSegment;
-	    this.entities[ 1 ].position.x = Math.round( Math.random() * 3 ) * this.entities[ 1 ].size.x;
+	    this.entities[ 1 ].position.x = Math.round( Math.random() * 4 ) * this.entities[ 1 ].size.x;
 	}
 
 	for ( id in this.entities ) {
@@ -61,7 +80,7 @@ function RacingGameState() {
 	    for ( var d = c + 1; d < this.entities.length; ++d ) {
 
 		car2 = this.entities[ d ];
-
+		
 		if ( this.checkCollision( car1, car2 ) || this.checkCollision( car2, car1 ) ) {
 
 		    car1.stop();
@@ -74,6 +93,7 @@ function RacingGameState() {
 			return gameStateList.gameOver;
 		    }
 		}
+		
 	    }
 	}
 	

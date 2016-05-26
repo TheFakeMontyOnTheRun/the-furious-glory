@@ -39,12 +39,16 @@ function PoliceCar(x, y, style ) {
 	}
 
 	this.moveLeft = function() {
-	    this.currentAction = this.movingLeft;
-	    this.targetPosition = ( Math.floor( this.position.x / this.size.x ) - 1 ) * this.size.x;
+	    if ( this.position.x >= 20 && this.currentAction == this.justRunning ) {
+		this.currentAction = this.movingLeft;
+		this.targetPosition = ( Math.floor( this.position.x / this.size.x ) - 1 ) * this.size.x;
+	    }
 	}
 
 	this.moveRight = function() {
-	    this.currentAction = this.movingRight;
-	    this.targetPosition = ( Math.floor( this.position.x / this.size.x ) + 1 ) * this.size.x;
+	    if ( this.position.x <= 4 * ( 20 ) && this.currentAction == this.justRunning ) {
+		this.currentAction = this.movingRight;
+		this.targetPosition = ( Math.floor( this.position.x / this.size.x ) + 1 ) * this.size.x;
+	    }
 	}
 }
