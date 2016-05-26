@@ -1,9 +1,9 @@
 function PoliceCar(x, y, style ) {
 	this.position = new Vec2(x,y);
 	this.size = new Vec2(20, 50 );
-	this.engine = new Engine( 4, 1 );
+	this.engine = new Engine( 4, 2 );
 	this.appearance = style;
-
+	this.lane = x / this.size.x;
 	this.targetPosition;
 
 	this.movingLeft = function() {
@@ -12,6 +12,7 @@ function PoliceCar(x, y, style ) {
 
 	    if ( this.position.x <= this.targetPosition ) {
 		this.currentAction = this.justRunning;
+		this.position.x = this.targetPosition;
 	    }
 	}
 
@@ -20,6 +21,7 @@ function PoliceCar(x, y, style ) {
 
 	    if ( this.position.x >= this.targetPosition ) {
 		this.currentAction = this.justRunning;
+		this.position.x = this.targetPosition;
 	    }
 	}
 
@@ -30,7 +32,6 @@ function PoliceCar(x, y, style ) {
 
 	this.update = function() {
 		this.engine.update( this.position );
-	
 		this.currentAction();
 	}
 
@@ -39,16 +40,18 @@ function PoliceCar(x, y, style ) {
 	}
 
 	this.moveLeft = function() {
-	    if ( this.position.x >= 20 && this.currentAction == this.justRunning ) {
+	    if ( this.lane > 0 && this.currentAction == this.justRunning ) {
+		this.lane--;
 		this.currentAction = this.movingLeft;
-		this.targetPosition = ( Math.floor( this.position.x / this.size.x ) - 1 ) * this.size.x;
+		this.targetPosition = this.lane * this.size.x;
 	    }
 	}
 
 	this.moveRight = function() {
-	    if ( this.position.x <= 4 * ( 20 ) && this.currentAction == this.justRunning ) {
+	    if ( this.lane < 3 && this.currentAction == this.justRunning ) {
+		this.lane++;
 		this.currentAction = this.movingRight;
-		this.targetPosition = ( Math.floor( this.position.x / this.size.x ) + 1 ) * this.size.x;
+		this.targetPosition = this.lane * this.size.x;
 	    }
 	}
 }

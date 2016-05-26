@@ -4,7 +4,7 @@ var toLoad;
 
 function GameAssets() {
 
-    toLoad = 11;
+    toLoad = 8;
 	
     this.onImageDoneLoading = function() {
 	toLoad--;
@@ -34,16 +34,6 @@ function GameAssets() {
     this.roadCenter = new Image();
     this.roadCenter.onload = this.onImageDoneLoading;
 
-    this.policeCar = [
-		      new Image(),
-		      new Image(),
-		      new Image()
-		      ];
-
-    for ( id in this.policeCar ) {
-	this.policeCar[ id ].onload = this.onImageDoneLoading;
-    }
-
     this.isReadyToProceed = function() {
 	return toLoad <= 0;
     }
@@ -56,8 +46,4 @@ function GameAssets() {
     this.roadLeftCorner.src = "images/roadLeft.png";
     this.roadCenter.src = "images/roadCenter.png";
     this.roadRightCorner.src = "images/roadRight.png";
-
-    for (id in this.policeCar ) {
-	this.policeCar[ id ].src = "images/police" + id + ".png";
-    }
 }
