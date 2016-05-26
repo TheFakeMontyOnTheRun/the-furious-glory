@@ -4,13 +4,17 @@ Game.fps = 30;
 
 Game.initialize = function() {
     
-    this.entities = {   gameTitle: new TitleScreenGameState(),
+    this.entities = {  gameLoading: new LoadingScreenGameState(), 
+		       gameTitle: new TitleScreenGameState(),
 			gamePlay: new RacingGameState(),
 			gameOver: new GameOverGameState()
     };
+
+    //not my brightest hour, but I'm no Javascript programmer and the deadline looms by
+    this.entities.gamePlay.gameAssets = this.entities.gameLoading.gameAssets;
     
     this.context = document.getElementById("canvas").getContext("2d");
-    this.currentState = this.entities.gameTitle; 
+    this.currentState = this.entities.gameLoading; 
 };
 
 Game.draw = function() {

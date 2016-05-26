@@ -8,7 +8,7 @@ function PoliceCar(x, y, style ) {
 
 	this.movingLeft = function() {
 
-	    this.position.x--;
+	    this.position.x-=this.engine.speed;
 
 	    if ( this.position.x <= this.targetPosition ) {
 		this.currentAction = this.justRunning;
@@ -16,7 +16,7 @@ function PoliceCar(x, y, style ) {
 	}
 
 	this.movingRight = function() {
-	    this.position.x++;
+	    this.position.x+=this.engine.speed;
 
 	    if ( this.position.x >= this.targetPosition ) {
 		this.currentAction = this.justRunning;
