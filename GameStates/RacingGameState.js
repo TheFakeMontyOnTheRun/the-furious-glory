@@ -1,5 +1,6 @@
 var score = 0;
 
+//this begs a refactor, but I'm not really a JS developer, so I don't really know good automatic tools.
 function RacingGameState() {
 
     this.readySound = new Audio("apert.wav");
@@ -8,14 +9,12 @@ function RacingGameState() {
     //my kingdom for a constant
     this.numberOfLanes = 4;
     this.borderSpaceOnEdgeLanes = 32;
-    this.textureHeight = 128;
+    this.textureHeight = 127;
     this.laneWidth = 64;
     this.laneWidthInWorldSpace = 20;
     this.screenWidth = 800;
     this.screenHeight = 600;
     this.treePatchTextureWidth = 230;
-
-    this.camera = new Vec2( 0, 200 );
 
     this.lanePosition = function( lane ) {
 	return lane * this.laneWidthInWorldSpace;
@@ -47,7 +46,7 @@ function RacingGameState() {
 	var roadTilePosition;
 
 	for ( var i = -1; i < (Math.ceil( this.screenHeight / this.textureHeight) + 1 ); ++i ) {
-	    roadPiecePos = offset + ( i * 128 );
+	    roadPiecePos = offset + ( i * this.textureHeight );
 
 	    roadTilePosition = center;
 	    context.drawImage( this.gameAssets.roadCenter, roadTilePosition, roadPiecePos );
@@ -91,8 +90,7 @@ function RacingGameState() {
     
     this.update = function() {
 
-	this.currentRoadSegment += this.entities[ 0 ].engine.speed - this.entities[ 0 ].engine.acceleration;
-	this.camera.y = this.currentRoadSegment;
+	this.currentRoadSegment += this.entities[ 0 ].engine.speed + this.entities[ 0 ].engine.acceleration;
 	this.timeForNextCar--;
 
 	if ( this.timeForNextCar == 0 ) {

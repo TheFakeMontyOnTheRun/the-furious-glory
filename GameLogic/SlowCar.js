@@ -1,7 +1,7 @@
 function SlowCar(x, y, accel,style ) {
 	this.position = new Vec2(x, y);
 	this.size = new Vec2( 20, 40 );
-	this.engine = new Engine(1, accel);
+	this.engine = new Engine(1, accel, 20);
 	this.appearance = style;
 	this.lane = x / this.size.x;
 

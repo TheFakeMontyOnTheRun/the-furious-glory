@@ -1,7 +1,7 @@
 function PoliceCar(x, y, style ) {
 	this.position = new Vec2(x,y);
 	this.size = new Vec2(20, 50 );
-	this.engine = new Engine( 4, 2 );
+	this.engine = new Engine( 0, 0.025, 25 );
 	this.appearance = style;
 	this.lane = x / this.size.x;
 	this.targetPosition;
