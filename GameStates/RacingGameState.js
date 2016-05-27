@@ -3,9 +3,11 @@ var score = 0;
 //this begs a refactor, but I'm not really a JS developer, so I don't really know good automatic tools.
 function RacingGameState() {
 
-    this.readySound = new Audio("apert.wav");
-    this.readySound.play();
-
+    this.crashSound = new Audio( "sounds/crash.wav" );
+    this.skidSound = new Audio( "sounds/skid.wav" );
+    this.acceleratingSound = new Audio( "sounds/accelerating.wav");
+    this.revvingSound = new Audio( "sounds/regularEngine.wav");
+    this.turnSound = new Audio( "sounds/turn.wav" );
     //my kingdom for a constant
     this.numberOfLanes = 4;
     this.timeForCarSpawn = 100;
@@ -30,6 +32,9 @@ function RacingGameState() {
 	this.timeForNextCar = this.timeForCarSpawn;
 	this.playerCar = this.entities[ 0 ];
     };
+
+    
+
 
     this.translateToScreenSpace = function( worldSpacePosition ) {
 	return new Vec2( ( 800 / 2 ) - ( ( this.numberOfLanes / 2 ) * this.gameAssets.laneWidth ) + this.gameAssets.laneWidth * ( ( worldSpacePosition.x) / this.gameAssets.laneWidthInWorldSpace ), this.currentRoadSegment - worldSpacePosition.y + this.gameAssets.textureHeight);
@@ -101,24 +106,27 @@ function RacingGameState() {
 		
 		if ( this.checkCollision( car1, car2 ) ) {
 		    if ( this.isHole( car2 ) ) {
-			this.readySound.play();
+			this.skidSound.play();
 			this.penalties -= car2.hitPenalty;
 		    } else if ( this.isOilSpill( car2 ) ){
 			car1.skid();
+			this.skidSound.play();
 		    } else {
-			
+
 			car1.stop();
 			car2.stop();
 
 			if ( this.isPlayer( car1 ) || this.isPlayer( car2 ) ) {
 			    score = this.currentRoadSegment;
-			    
+			    this.revvingSound.pause();			    
+			    this.crashSound.play();
+			    //if I were to use onended, this would get way too complicated.
 			    return function( gameStateList ) {
 				gameStateList.gameOver.init( score );
 				return gameStateList.gameOver;
 			    }
+
 			}
-			
 		    }
 		}
 	    }
@@ -146,9 +154,11 @@ function RacingGameState() {
     
     this.onLeft = function() {
 	this.playerCar.moveLeft();
+	this.turnSound.play();
     };
     
     this.onRight = function() {
 	this.playerCar.moveRight();
+	this.turnSound.play();
     };
 };

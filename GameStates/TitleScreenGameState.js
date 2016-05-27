@@ -2,6 +2,8 @@ function TitleScreenGameState() {
 
     this.init = function() {
 	this.pressedAnyKey = false;
+	readySound = new Audio("sounds/apert.wav");
+	readySound.play();
     };
 
     this.currentRoadSegment = 0;
