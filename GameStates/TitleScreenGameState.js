@@ -4,6 +4,7 @@ function TitleScreenGameState() {
 	this.pressedAnyKey = false;
 	readySound = new Audio("sounds/apert.wav");
 	readySound.play();
+	this.framesToIgnoreKeys = 60;
     };
 
     this.currentRoadSegment = 0;
@@ -13,16 +14,19 @@ function TitleScreenGameState() {
 	context.fillStyle = "#FF0";
 	context.font = "30px Verdana";
 	context.fillText( "The Furious Glory!", 10, 50 );
-	context.font = "10px Verdana";
-	context.fillText( "Press LEFT to play", 20, 70 );
+
+	if ( this.framesToIgnoreKeys <= 0 ) {
+	    context.font = "15px Verdana";
+	    context.fillText( "Press LEFT or RIGHT to play", 20, 75 );
+	}
 
 	context.font = "20px Verdana";
 	context.fillText( "A game by Daniel Monteiro", 10, 560 );
     };
 
     this.update = function() {
-
-	this.currentRoadSegment++;
+	this.framesToIgnoreKeys--;
+	this.currentRoadSegment--;
 
 	if ( this.pressedAnyKey ) {
 	    return function( gameStateList) {
@@ -37,10 +41,14 @@ function TitleScreenGameState() {
     };
 
     this.onLeft = function() {
-	this.pressedAnyKey = true;
+	if ( this.framesToIgnoreKeys <= 0 ) {
+	    this.pressedAnyKey = true;
+	}
     };
 
     this.onRight = function() {
-	//	this.pressedAnyKey = true;
+	if ( this.framesToIgnoreKeys <= 0 ) {
+	    this.pressedAnyKey = true;
+	}
     };
 };

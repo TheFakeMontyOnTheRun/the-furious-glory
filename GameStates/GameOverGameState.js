@@ -6,6 +6,7 @@ function GameOverGameState() {
     this.currentRoadSegment = 0;
 
     this.init = function( score ) {
+	this.ticksToIgnoreKeys = 60;
 	this.pressedAnyKey = false;
 	this.currentScore = Math.ceil(score);
 	if ( this.highestScore <= this.currentScore ) {
@@ -19,7 +20,7 @@ function GameOverGameState() {
     this.draw = function(context) {
 	drawRoadWithOffset( context, this.gameAssets, this.currentRoadSegment );
     
-	context.fillStyle = "#FFF";
+	context.fillStyle = "#FF0";
 	context.font = "15px Verdana";
 	context.fillText("Your score: " + this.currentScore, 10, 50 );
 	if ( this.gotTheHighestScore ) {
@@ -33,13 +34,15 @@ function GameOverGameState() {
 	context.font = "30px Verdana";
 	context.fillText( "GAME OVER", 300, 300 );
 
-	context.font = "15px Verdana";
-	context.fillText("Press RIGHT to proceed to the title screen", 10, 560 );
+	if ( this.ticksToIgnoreKeys <= 0 ) {
+	    context.font = "15px Verdana";
+	    context.fillText("Press LEFT or RIGHT to proceed to the title screen", 10, 560 );
+	}
     };
     
     this.update = function() {
-	
-	this.currentRoadSegment++;
+	this.ticksToIgnoreKeys--;
+	this.currentRoadSegment-=2;
 
 	if ( this.pressedAnyKey ) {
 	    return function( gameStateList ) {
@@ -54,10 +57,14 @@ function GameOverGameState() {
     };
         
     this.onLeft = function() {
-	//this.pressedAnyKey = true;
+	if ( this.ticksToIgnoreKeys <= 0 ) {
+	    this.pressedAnyKey = true;
+	}
     };
     
     this.onRight = function() {
-	this.pressedAnyKey = true;
+	if ( this.ticksToIgnoreKeys <= 0 ) {
+	    this.pressedAnyKey = true;
+	}
     };
 }

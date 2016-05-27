@@ -56,7 +56,7 @@ function RacingGameState() {
 	    context.drawImage( carSprite, screenPosition.x, screenPosition.y );
 	}
 
-	context.fillStyle = "#F00";
+	context.fillStyle = "#FF0";
 	context.fillText( "Score: " + Math.ceil( this.currentRoadSegment - this.penalties), 10, 50 );
 	context.fillText( "Speed: " + Math.floor(this.playerCar.engine.speed), 10, 70 );
 
